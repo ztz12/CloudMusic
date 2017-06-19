@@ -135,9 +135,9 @@ public class PlayListActivity extends BaseActivity {
                 if (findFirstVisibleItemPosition == 0) {
                     headView = recyclerView.getChildAt(findFirstVisibleItemPosition);
                 }
-                float alpha = 0;
+                float alpha = 0;//完全透明
                 if (headView == null) {
-                    alpha = 1;
+                    alpha = 1;//不透明
                 } else {
                     alpha = Math.abs(headView.getTop() * 1.0f) / headView.getHeight();
                 }
