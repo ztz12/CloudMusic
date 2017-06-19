@@ -8,23 +8,46 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.annotation.LayoutRes;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.ztz.cloudmusic.R;
 import com.ztz.cloudmusic.bean.Constant;
 import com.ztz.cloudmusic.service.MusicService;
 
+import java.util.ArrayList;
+
 /**
+ *
  * Created by wqewqe on 2017/6/16.
  */
 
 //public abstract class BaseActivity extends AppCompatActivity {
 public class BaseActivity extends AppCompatActivity {
+    /**
+     * app:layout_behavior="@string/bottom_sheet_behavior"
+     这个属性需要设置在触发滚动事件的view之上
+     app:behavior_hideable="false"说明这个BottomSheet不可以被手动滑动隐藏，设置为true则可以滑到屏幕最底部隐藏。
+     app:behavior_peekHeight设置的是折叠状态时的高度。
+     需要监听Bottom Sheets回调的状态，可以通过setBottomSheetCallback来实现,可以通过
+     BottomSheetBehavior.setState 方法来设置开关状态
+     STATE_COLLAPSED: 关闭Bottom Sheets,显示peekHeight的高度，默认是0
+     STATE_DRAGGING: 用户拖拽Bottom Sheets时的状态
+     STATE_SETTLING: 当Bottom Sheets view摆放时的状态。
+     STATE_EXPANDED: 当Bottom Sheets 展开的状态
+     STATE_HIDDEN: 当Bottom Sheets 隐藏的状态
+     * @param savedInstanceState
+     */
     public static String TAG = "BaseActivity";
     public  ImageView iv_playStatus;
     public  MusicBroadCastReceiver musicReceiver;
@@ -50,6 +73,8 @@ public class BaseActivity extends AppCompatActivity {
      * @param layoutResID
      */
 //    public abstract int layoutResID();
+     ArrayList<String> stringList=new ArrayList<>();
+    private RecyclerView rlView;
 
     //方式二
     @Override
@@ -66,6 +91,7 @@ public class BaseActivity extends AppCompatActivity {
         TAG = getClass().getName();
         register();
         bindMusicService();
+
     }
 
     private void initBottomView(View bottomView) {
@@ -82,7 +108,58 @@ public class BaseActivity extends AppCompatActivity {
                 }
             }
         });
+        rlView = (RecyclerView)bottomView.findViewById(R.id.rl_base);
+        ImageView ivShow=(ImageView)bottomView.findViewById(R.id.iv_show);
+        LinearLayout ll=(LinearLayout)bottomView.findViewById(R.id.ll_base);
+        rlView.setLayoutManager(new LinearLayoutManager(this));
+        for(int i=0;i<20;i++){
+            stringList.add("Item: "+i);
+        }
+        PlayListAdapter adapter=new PlayListAdapter(stringList);
+        rlView.setAdapter(adapter);
+        behavior=BottomSheetBehavior.from(ll);
+        ivShow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            }
+        });
     }
+    BottomSheetBehavior behavior;
+    class PlayListAdapter extends RecyclerView.Adapter{
+        ArrayList<String> strings;
+
+        public PlayListAdapter(ArrayList<String> strings) {
+            this.strings = strings;
+        }
+
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_1,null);
+            ViewHolder viewHolder = new ViewHolder(view);
+            return viewHolder;
+        }
+        class ViewHolder extends RecyclerView.ViewHolder{
+            TextView textView;
+            public ViewHolder(View itemView) {
+                super(itemView);
+                textView = (TextView) itemView.findViewById(android.R.id.text1);
+            }
+        }
+
+
+        @Override
+        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+            ViewHolder viewHolder = (ViewHolder) holder;
+            viewHolder.textView.setText(strings.get(position) +" ");
+        }
+
+        @Override
+        public int getItemCount() {
+            return strings.size();
+        }
+    }
+
 
     private void register() {
         musicReceiver = new MusicBroadCastReceiver();
