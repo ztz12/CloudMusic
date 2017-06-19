@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.ztz.cloudmusic.activity.GuideActivity">
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:background="@color/bg_color"
+        android:id="@+id/bg_red"/>
+    <LinearLayout
+        android:id="@+id/ll_title"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:orientation="vertical">
+
+       <TextSwitcher
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:id="@+id/ts_title"
+           android:padding="10dp"></TextSwitcher>
+        <TextSwitcher
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/ts_desc"
+            android:padding="10dp"></TextSwitcher>
+    </LinearLayout>
+
+   <android.support.v4.view.ViewPager
+       android:layout_below="@id/ll_title"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:id="@+id/vp"></android.support.v4.view.ViewPager>
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:orientation="vertical"
+       android:gravity="center"
+       android:layout_alignParentBottom="true">
+   <com.rd.PageIndicatorView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       app:piv_selectedColor="@color/bg_color"
+       app:piv_unselectedColor="@color/color1"
+       android:id="@+id/pageIndicatorView"
+       android:layout_marginBottom="10dp"/>
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          android:gravity="center"
+          android:layout_marginBottom="25dp">
+
+
+         <Button
+             android:layout_width="130dp"
+             android:layout_height="40dp"
+             android:textColor="@android:color/white"
+             android:text="登录/注册"
+             android:id="@+id/btn_login"
+             android:layout_marginLeft="25dp"
+             android:onClick="btn_login"
+             android:background="@drawable/bt_login_selector"/>
+
+         <Button
+             android:layout_width="130dp"
+             android:layout_height="40dp"
+             android:text="立刻体验"
+             android:textColor="@drawable/selector1"
+             android:onClick="btn_experience"
+             android:background="@drawable/selector2"
+             android:layout_marginLeft="20dp"/>
+      </LinearLayout>
+      </LinearLayout>
+</RelativeLayout>

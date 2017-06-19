@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color5">
+    <LinearLayout style="@style/menu_item_style">
+
+        <ImageView
+            style="@style/menu_item_imageview_style"
+            android:src="@mipmap/ag2" />
+
+        <TextView
+            style="@style/menu_item_textview_style"
+            android:text="我的消息" />
+    </LinearLayout>
+
+
+    <LinearLayout style="@style/menu_item_style">
+
+        <ImageView
+            style="@style/menu_item_imageview_style"
+            android:src="@mipmap/aga" />
+
+        <TextView
+            style="@style/menu_item_textview_style"
+            android:text="会员中心" />
+    </LinearLayout>
+
+
+    <LinearLayout style="@style/menu_item_style">
+
+        <ImageView
+            style="@style/menu_item_imageview_style"
+            android:src="@mipmap/afy" />
+
+        <TextView
+            style="@style/menu_item_textview_style"
+            android:text="在线听歌免流量" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        style="@style/menu_item_style"
+        android:layout_marginTop="2dp">
+
+        <ImageView
+            style="@style/menu_item_imageview_style"
+            android:src="@mipmap/ag2" />
+
+        <TextView
+            style="@style/menu_item_textview_style"
+            android:text="我的好友" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        style="@style/menu_item_style"
+        android:layout_marginBottom="2dp">
+
+        <ImageView
+            style="@style/menu_item_imageview_style"
+            android:src="@mipmap/ag2" />
+
+        <TextView
+            style="@style/menu_item_textview_style"
+            android:text="附近的人" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/menu_item_style">
+
+        <ImageView
+            style="@style/menu_item_imageview_style"
+            android:src="@mipmap/ag7" />
+
+        <TextView
+            style="@style/menu_item_textview_style"
+            android:text="个性换肤" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/menu_item_style">
+
+        <ImageView
+            style="@style/menu_item_imageview_style"
+            android:src="@mipmap/ag0" />
+
+        <TextView
+            style="@style/menu_item_textview_style"
+            android:text="听歌识曲" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/menu_item_style">
+
+        <ImageView
+            style="@style/menu_item_imageview_style"
+            android:src="@mipmap/ag9" />
+
+        <TextView
+            style="@style/menu_item_textview_style"
+            android:text="定时停止播放" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/menu_item_style">
+
+        <ImageView
+            style="@style/menu_item_imageview_style"
+            android:src="@mipmap/afu" />
+
+        <TextView
+            style="@style/menu_item_textview_style"
+            android:text="音乐闹钟" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/menu_item_style">
+
+        <ImageView
+            style="@style/menu_item_imageview_style"
+            android:src="@mipmap/ag10" />
+
+        <TextView
+            style="@style/menu_item_textview_style"
+            android:text="驾驶模式" />
+    </LinearLayout>
+
+    </LinearLayout>

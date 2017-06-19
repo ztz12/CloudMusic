@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+  <View
+      android:layout_width="match_parent"
+      android:layout_height="24sp"
+    android:background="@color/color4"/>
+  <android.support.v7.widget.Toolbar
+      android:layout_width="match_parent"
+      android:layout_height="?attr/actionBarSize"
+      android:background="@color/bg_color">
+    <ImageView
+        android:layout_width="23dp"
+        android:src="@mipmap/ic_menu"
+        android:layout_height="wrap_content"
+        android:id="@+id/iv_main"/>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center">
+      <ImageView
+          android:id="@+id/my"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:src="@drawable/action_my_sel" />
+
+      <ImageView
+          android:id="@+id/found"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:src="@drawable/actionbar_found_sel" />
+
+      <ImageView
+          android:id="@+id/friend"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:src="@drawable/actionbar_friend_sel" />
+    </LinearLayout>
+  </android.support.v7.widget.Toolbar>
+  <android.support.v4.view.ViewPager
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:layout_weight="1"
+      android:id="@+id/vp_main"></android.support.v4.view.ViewPager>
+  <FrameLayout
+      android:layout_width="match_parent"
+      android:layout_height="50dp"
+      android:layout_gravity="bottom|end">
+    <include layout="@layout/layout_bottom_nav"/>
+  </FrameLayout>
+
+</LinearLayout>
