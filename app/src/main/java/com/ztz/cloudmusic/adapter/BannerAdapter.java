@@ -14,7 +14,7 @@ import java.util.List;
  */
 
 public class BannerAdapter extends PagerAdapter {
-   List<Result> resultList;
+    List<Result> resultList;
 
     public BannerAdapter(List<Result> resultList) {
         this.resultList = resultList;
@@ -27,13 +27,13 @@ public class BannerAdapter extends PagerAdapter {
 
     @Override
     public boolean isViewFromObject(View view, Object object) {
-        return view==object;
+        return view == object;
     }
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-       //获取图片链接;
-        SmartImageView smartImageView=resultList.get(position).getSmartImageView();
+        //获取图片链接;
+        SmartImageView smartImageView = resultList.get(position).getSmartImageView();
         //通过图片链接加载图片;
         smartImageView.setImageUrl(resultList.get(position).getPicurl());
         container.addView(smartImageView);

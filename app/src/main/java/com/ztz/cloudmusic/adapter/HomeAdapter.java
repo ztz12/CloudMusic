@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.loopj.android.image.SmartImageView;
 import com.ztz.cloudmusic.R;
 import com.ztz.cloudmusic.activity.PlayListActivity;
+import com.ztz.cloudmusic.activity.base.BaseActivity;
 import com.ztz.cloudmusic.bean.Home;
 import com.ztz.cloudmusic.bean.HomeResponse;
 
@@ -161,6 +162,7 @@ public class HomeAdapter extends RecyclerView.Adapter {
                 public void onClick(View v) {
                     Intent intent = new Intent(holder.itemView.getContext(), PlayListActivity.class);
                     intent.putExtra(PlayListActivity.PLAYLISTBEAN_KEY, playListBean);
+                    intent.putExtra(BaseActivity.PLAYLIST_KEY,playListBean);
                     try {
                         intent.putExtra(PlayListActivity.AUTHOR_KEY, playListBean.getAuthor().getUsername());
                     } catch (Exception e) {

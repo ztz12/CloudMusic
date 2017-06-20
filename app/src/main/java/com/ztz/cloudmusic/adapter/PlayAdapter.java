@@ -18,8 +18,8 @@ import java.util.List;
  */
 
 public class PlayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private static final int TYPE_HEAD=0;
-    private static final int TYPE_NOR=1;
+    private static final int TYPE_HEAD = 0;
+    private static final int TYPE_NOR = 1;
     List<MusicResponse.ResultsBean> resultsBeanList;
 
     public PlayAdapter(List<MusicResponse.ResultsBean> resultsBeanList) {
@@ -29,14 +29,14 @@ public class PlayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
-        RecyclerView.LayoutManager manager=recyclerView.getLayoutManager();
-        if(manager instanceof GridLayoutManager){
-            final GridLayoutManager gridLayoutManager= (GridLayoutManager) manager;
+        RecyclerView.LayoutManager manager = recyclerView.getLayoutManager();
+        if (manager instanceof GridLayoutManager) {
+            final GridLayoutManager gridLayoutManager = (GridLayoutManager) manager;
             gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                 @Override
                 public int getSpanSize(int position) {
-                    int temp=getItemViewType(position);
-                    if(headView!=null&&temp==TYPE_HEAD){
+                    int temp = getItemViewType(position);
+                    if (headView != null && temp == TYPE_HEAD) {
                         return gridLayoutManager.getSpanCount();
                     }
                     return 1;
@@ -47,27 +47,31 @@ public class PlayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if(viewType==TYPE_HEAD) {
+        if (viewType == TYPE_HEAD) {
             return new HeadViewHolder(headView);//要返回return
         }
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_play, parent, false);
-            PlayViewHolder holder = new PlayViewHolder(view);
-            return holder;
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_play, parent, false);
+        PlayViewHolder holder = new PlayViewHolder(view);
+        return holder;
 
     }
+
     View headView;
-    public void setHead(View view){
-        headView=view;
+
+    public void setHead(View view) {
+        headView = view;
     }
-    class HeadViewHolder extends RecyclerView.ViewHolder{
+
+    class HeadViewHolder extends RecyclerView.ViewHolder {
 
         public HeadViewHolder(View itemView) {
             super(itemView);
         }
     }
+
     @Override
     public int getItemViewType(int position) {
-        if(headView!=null&&position==0){
+        if (headView != null && position == 0) {
             return TYPE_HEAD;
         }
         return TYPE_NOR;
@@ -75,31 +79,35 @@ public class PlayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if(headView!=null&&position==0){
+        if (headView != null && position == 0) {
             return;
         }
-        if(headView!=null){
-            position=position-1;
+        if (headView != null) {
+            position = position - 1;
         }
-        MusicResponse.ResultsBean resultsBean=resultsBeanList.get(position);
-        PlayViewHolder playViewHolder= (PlayViewHolder) holder;
+        MusicResponse.ResultsBean resultsBean = resultsBeanList.get(position);
+        PlayViewHolder playViewHolder = (PlayViewHolder) holder;
         try {
             playViewHolder.smartImageView.setImageUrl(resultsBean.getPicUrl().getUrl());
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
 
         playViewHolder.tvPlay.setText(resultsBean.getName());
     }
-    class PlayViewHolder extends RecyclerView.ViewHolder{
+
+    class PlayViewHolder extends RecyclerView.ViewHolder {
         SmartImageView smartImageView;
         TextView tvPlay;
+
         public PlayViewHolder(View itemView) {
             super(itemView);
-            smartImageView=(SmartImageView)itemView.findViewById(R.id.smart_playlist);
-            tvPlay=(TextView)itemView.findViewById(R.id.tv_listName);
+            smartImageView = (SmartImageView) itemView.findViewById(R.id.smart_playlist);
+            tvPlay = (TextView) itemView.findViewById(R.id.tv_listName);
         }
     }
+
     @Override
     public int getItemCount() {
-        return resultsBeanList.size()+(headView!=null?1:0);
+        return resultsBeanList.size() + (headView != null ? 1 : 0);
     }
 }

@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="250dp"
         android:id="@+id/ll_base"
-        android:background="@color/color4"
+        android:background="#ddc3c3"
         android:orientation="vertical"
         app:layout_behavior="@string/bottom_sheet_behavior"
         app:behavior_peekHeight="0dp"

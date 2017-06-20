@@ -38,7 +38,7 @@ public class PlayDetailActivity extends AppCompatActivity {
     TextView tvPName;
     @BindView(R.id.tv_artist)
     TextView tvArtist;
-//    ArrayList<PlayListResponse.ResultsBean> resultsBeanList;
+    //    ArrayList<PlayListResponse.ResultsBean> resultsBeanList;
     //歌单歌曲列表
     PlayList mPlayList;
     @BindView(R.id.iv_last)
@@ -60,7 +60,7 @@ public class PlayDetailActivity extends AppCompatActivity {
 //        Log.i(TAG, "onCreate: " + resultsBean);
         //获取下标
         int position = getIntent().getIntExtra(INDEX_KEY, 0);
-        PlayList.Music music=mPlayList.getMusics().get(position);
+        PlayList.Music music = mPlayList.getMusics().get(position);
         Log.i(TAG, "onCreate: " + position);
         String url = "http://ac-kCFRDdr9.clouddn.com/e3e80803c73a099d96a5.jpg";
         if (music.getAlbumPicUrl() != null) {
@@ -95,9 +95,9 @@ public class PlayDetailActivity extends AppCompatActivity {
                 break;
             case R.id.iv_now:
                 ivNow.setSelected(!ivNow.isSelected());
-                if(ivNow.isSelected()){
+                if (ivNow.isSelected()) {
                     ivNow.setImageResource(R.mipmap.play_rdi_btn_play);
-                }else {
+                } else {
                     ivNow.setImageResource(R.mipmap.play_rdi_btn_pause);
                 }
                 disv.playPause();

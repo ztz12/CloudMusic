@@ -72,7 +72,8 @@ public class PlayListActivity extends BaseActivity {
     ImageView iv_play_bg;
     private PlayBroadCast broadCast;
     //歌单对象
-    PlayList mPlayList=new PlayList();
+    PlayList mPlayList = new PlayList();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,11 +96,11 @@ public class PlayListActivity extends BaseActivity {
         tv_playListName = (TextView) headView.findViewById(R.id.tv_playListName);
         tv_author = (TextView) headView.findViewById(R.id.tv_author);
         smartImageView = (SmartImageView) headView.findViewById(R.id.smart_play_view);
-        iv_play_bg=(ImageView)headView.findViewById(R.id.iv_play_bg);
+        iv_play_bg = (ImageView) headView.findViewById(R.id.iv_play_bg);
         //模糊背景
         Glide.with(this).load(playListBean.getPicUrl())
                 //模糊图片, 10 模糊度   5 将图片缩放到5倍后进行模糊
-                .bitmapTransform(new BlurTransformation(this,10,5))
+                .bitmapTransform(new BlurTransformation(this, 10, 5))
                 .into(iv_play_bg);
         adapter = new PlayListAdapter(mPlayList);
         adapter.setHeaderView(headView);
@@ -151,7 +152,7 @@ public class PlayListActivity extends BaseActivity {
         });
         registerBroadCast();
 //        bindMusicService();
-        iv_list=(ImageView)headView.findViewById(R.id.iv_list_play);
+        iv_list = (ImageView) headView.findViewById(R.id.iv_list_play);
         iv_list.setColorFilter(Color.BLACK);
     }
 //
@@ -198,7 +199,7 @@ public class PlayListActivity extends BaseActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
 //            Toast.makeText(context, "接收到消息", Toast.LENGTH_SHORT).show();
-           PlayList  bean = intent.getParcelableExtra(PlayListAdapter.PLAYDATA_KEY);//通过intent拿数据
+            PlayList bean = intent.getParcelableExtra(PlayListAdapter.PLAYDATA_KEY);//通过intent拿数据
 
             musicBinder.play(bean);
             ivPlayStatus.setImageResource(R.mipmap.play_rdi_btn_pause);
@@ -235,11 +236,11 @@ public class PlayListActivity extends BaseActivity {
                 PlayListResponse playListResponse = gson.fromJson(result, PlayListResponse.class);
                 resultsBeanList.addAll(playListResponse.getResults());
                 mPlayList.setObjectId(playListBean.getObjectId());
-                ArrayList<PlayList.Music> musics=new ArrayList<>();
-                for(int i=0;i<playListResponse.getResults().size();i++){
-                    PlayListResponse.ResultsBean bean=playListResponse.getResults().get(i);
-                    String albumPic=bean.getAlbumPic()==null?"":bean.getAlbumPic().getUrl();
-                    PlayList.Music music=new PlayList.Music(
+                ArrayList<PlayList.Music> musics = new ArrayList<>();
+                for (int i = 0; i < playListResponse.getResults().size(); i++) {
+                    PlayListResponse.ResultsBean bean = playListResponse.getResults().get(i);
+                    String albumPic = bean.getAlbumPic() == null ? "" : bean.getAlbumPic().getUrl();
+                    PlayList.Music music = new PlayList.Music(
                             bean.getObjectId(),
                             bean.getTitle(),
                             bean.getArtist(),
@@ -248,19 +249,18 @@ public class PlayListActivity extends BaseActivity {
                             bean.getAlbum()
                     );
                     //使用服务的静态方法;
-                    int currIndex= MusicService.getCurrIndex();
-                    PlayList playList=MusicService.getCurrPlay();
+                    int currIndex = MusicService.getCurrIndex();
+                    PlayList playList = MusicService.getCurrPlay();
                     //需要判断正在播放的歌单是否和当前界面歌单的id一致，如果一致，那么直接取正在播放的下标
-                    if(currIndex!=-1&&playList!=null&&playList.getObjectId().equals(playListBean.getObjectId()))
-                    {
-                        if(i==currIndex){
+                    if (currIndex != -1 && playList != null && playList.getObjectId().equals(playListBean.getObjectId())) {
+                        if (i == currIndex) {
                             music.setPlayStatus(true);
                         }
                     }
                     musics.add(music);
                 }
                 mPlayList.setMusics(musics);
-                Log.i(TAG, "onResponse: "+musics.toString());
+                Log.i(TAG, "onResponse: " + musics.toString());
                 //在主线程刷新数据
                 runOnUiThread(new Runnable() {
                     @Override

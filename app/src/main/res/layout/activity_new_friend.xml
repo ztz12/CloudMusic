@@ -6,11 +6,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="com.ztz.cloudmusic.activity.base.NewFriendActivity">
+
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="跳转到测试界面"
-        android:onClick="test"/>
+        android:onClick="test"
+        android:text="跳转到测试界面" />
 
 
 </RelativeLayout>

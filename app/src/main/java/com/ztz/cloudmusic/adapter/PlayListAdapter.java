@@ -75,7 +75,7 @@ public class PlayListAdapter extends RecyclerView.Adapter {
             itemViewHolder.tv_number.setText((position+1)+"");
         }
 
-        itemViewHolder.tv_name.setText(bean.getArtist()+"-"+bean.getAlbum());
+        itemViewHolder.tv_name.setText(bean.getAlbum()+"-"+bean.getArtist());
         itemViewHolder.tv_album.setText(bean.getTitle());
         final int finalPosition = position;
         itemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {

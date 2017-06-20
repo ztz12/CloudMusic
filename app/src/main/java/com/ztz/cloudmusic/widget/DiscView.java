@@ -34,8 +34,8 @@ public class DiscView extends RelativeLayout {
     ImageView iv_disc_bg;
     ImageView iv_pic;
     private VPAdapter adapter;
-//    ArrayList<PlayListResponse.ResultsBean> resultBeanList;
-    ArrayList<ObjectAnimator> objectAnimators=new ArrayList<>();
+    //    ArrayList<PlayListResponse.ResultsBean> resultBeanList;
+    ArrayList<ObjectAnimator> objectAnimators = new ArrayList<>();
     /**
      * 唱针抬起角度
      */
@@ -69,12 +69,13 @@ public class DiscView extends RelativeLayout {
 
     //唱盘头像大小
     private float PIC_SIZE;
+
     public DiscView(Context context) {
-        this(context,null);
+        this(context, null);
     }
 
     public DiscView(Context context, AttributeSet attrs) {
-        this(context, attrs,0);
+        this(context, attrs, 0);
     }
 
     public DiscView(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -85,7 +86,7 @@ public class DiscView extends RelativeLayout {
     private void initViews(Context context) {
         initSize();
         //传入this表示加载当前布局disView
-        View.inflate(context, R.layout.layout_discview,this);
+        View.inflate(context, R.layout.layout_discview, this);
         initDesc();
         initNeedle();
         initViewPager(context);
@@ -94,12 +95,13 @@ public class DiscView extends RelativeLayout {
     /**
      * 使用集合来储存view
      * 监听viewpager滑动事件
+     *
      * @param context
      */
     private void initViewPager(Context context) {
-        vpDisc=(ViewPager)findViewById(R.id.vp_disc);
+        vpDisc = (ViewPager) findViewById(R.id.vp_disc);
 //        resultBeanList=new ArrayList<>();
-        viewList=new ArrayList<>();
+        viewList = new ArrayList<>();
         //模拟数据;
 //        for(int i=0;i<5;i++){
 //            //加载黑色底盘
@@ -120,34 +122,35 @@ public class DiscView extends RelativeLayout {
 //            Glide.with(context).load("http://ac-kCFRDdr9.clouddn.com/e3e80803c73a099d96a5.jpg").into(iv_pic);
 //            viewList.add(itemView);
 //        }
-        adapter=new VPAdapter();
+        adapter = new VPAdapter();
         vpDisc.setAdapter(adapter);
         vpDisc.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            int lastPositionOffsetPixels=0;//最后的位置
+            int lastPositionOffsetPixels = 0;//最后的位置
+
             //positionOffsetPixels前一个位置
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 //这里的position使用和平时的常见的指示的位置不一样
-                if(lastPositionOffsetPixels>positionOffsetPixels){
+                if (lastPositionOffsetPixels > positionOffsetPixels) {
 //                    Log.i(TAG, "onPageScrolled: "+"右滑");
-                    if(positionOffset<0.5){
-                        if(disChange!=null) {
+                    if (positionOffset < 0.5) {
+                        if (disChange != null) {
                             disChange.onActionBarChange(mPlayList.getMusics().get(position));
                         }
-                    }else {
+                    } else {
                         disChange.onActionBarChange(mPlayList.getMusics().get(vpDisc.getCurrentItem()));
                     }
-                }else if(lastPositionOffsetPixels<positionOffsetPixels){
-                    if(positionOffset>0.5){
-                        if(disChange!=null){
-                            disChange.onActionBarChange(mPlayList.getMusics().get(position+1));
+                } else if (lastPositionOffsetPixels < positionOffsetPixels) {
+                    if (positionOffset > 0.5) {
+                        if (disChange != null) {
+                            disChange.onActionBarChange(mPlayList.getMusics().get(position + 1));
                         }
-                    }else {
+                    } else {
                         disChange.onActionBarChange(mPlayList.getMusics().get(position));
                     }
 //                    Log.i(TAG, "onPageScrolled: "+"左滑");
                 }
-                lastPositionOffsetPixels=positionOffsetPixels;
+                lastPositionOffsetPixels = positionOffsetPixels;
             }
 
             @Override
@@ -161,39 +164,41 @@ public class DiscView extends RelativeLayout {
             }
         });
     }
+
     PlayList mPlayList;
-    public void setMusicData(PlayList playList,int position){
+
+    public void setMusicData(PlayList playList, int position) {
 //        resultBeanList.clear();
 //        resultBeanList.addAll(resultBean);
-        mPlayList=playList;
-        for(int i=0;i<mPlayList.getMusics().size();i++){
-            PlayList.Music bean=mPlayList.getMusics().get(i);
+        mPlayList = playList;
+        for (int i = 0; i < mPlayList.getMusics().size(); i++) {
+            PlayList.Music bean = mPlayList.getMusics().get(i);
             //循坏歌曲列表 创建view
-            View view= LayoutInflater.from(getContext()).inflate(R.layout.item_iv_disc,vpDisc,false);
-            iv_disc_bg=(ImageView)view.findViewById(R.id.iv_disc_bg);
-            RelativeLayout.LayoutParams params= (RelativeLayout.LayoutParams) iv_disc_bg.getLayoutParams();
-            params.height= (int) DISC_SIZE;
-            params.width= (int) DISC_SIZE;
-            params.topMargin= (int) DISC_MARGIN_TOP;
+            View view = LayoutInflater.from(getContext()).inflate(R.layout.item_iv_disc, vpDisc, false);
+            iv_disc_bg = (ImageView) view.findViewById(R.id.iv_disc_bg);
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_disc_bg.getLayoutParams();
+            params.height = (int) DISC_SIZE;
+            params.width = (int) DISC_SIZE;
+            params.topMargin = (int) DISC_MARGIN_TOP;
             iv_disc_bg.setLayoutParams(params);
             iv_disc_bg.setImageResource(R.mipmap.play_disc);
-            iv_pic=(ImageView)view.findViewById(R.id.iv_pic);
-            RelativeLayout.LayoutParams picParams= (RelativeLayout.LayoutParams) iv_pic.getLayoutParams();
-            picParams.height= (int) PIC_SIZE;
-            picParams.width= (int) PIC_SIZE;
-            picParams.topMargin= (int) (DISC_MARGIN_TOP+(DISC_SIZE-PIC_SIZE)/2);
+            iv_pic = (ImageView) view.findViewById(R.id.iv_pic);
+            RelativeLayout.LayoutParams picParams = (RelativeLayout.LayoutParams) iv_pic.getLayoutParams();
+            picParams.height = (int) PIC_SIZE;
+            picParams.width = (int) PIC_SIZE;
+            picParams.topMargin = (int) (DISC_MARGIN_TOP + (DISC_SIZE - PIC_SIZE) / 2);
             iv_pic.setLayoutParams(picParams);
-            view.setPivotY(DISC_MARGIN_TOP+DISC_SIZE/2);
-            view.setPivotX(((Activity)getContext()).getWindowManager().getDefaultDisplay().getWidth()/2);
-            if(bean.getAlbumPicUrl()!=null){
-                String url=bean.getAlbumPicUrl();
+            view.setPivotY(DISC_MARGIN_TOP + DISC_SIZE / 2);
+            view.setPivotX(((Activity) getContext()).getWindowManager().getDefaultDisplay().getWidth() / 2);
+            if (bean.getAlbumPicUrl() != null) {
+                String url = bean.getAlbumPicUrl();
                 Glide.with(getContext()).load(url).into(iv_pic);
             }
-            ObjectAnimator animator=ObjectAnimator.ofFloat(view,View.ROTATION,0,360);
+            ObjectAnimator animator = ObjectAnimator.ofFloat(view, View.ROTATION, 0, 360);
             animator.setDuration(10000);
             animator.setInterpolator(new LinearInterpolator());
             animator.setRepeatCount(ValueAnimator.INFINITE);//重复旋转
-            if(i==position) {
+            if (i == position) {
                 animator.start();
             }
             objectAnimators.add(animator);
@@ -202,24 +207,28 @@ public class DiscView extends RelativeLayout {
         adapter.notifyDataSetChanged();
         vpDisc.setCurrentItem(position);
     }
-    private void needleUp(){
-        ObjectAnimator animator2=ObjectAnimator.ofFloat(iv_needle,View.ROTATION,0,NEEDLE_UP_ROTATION);
+
+    private void needleUp() {
+        ObjectAnimator animator2 = ObjectAnimator.ofFloat(iv_needle, View.ROTATION, 0, NEEDLE_UP_ROTATION);
         animator2.setDuration(500);
         animator2.setInterpolator(new LinearInterpolator());
         animator2.start();
     }
-    private void needleDown(){
-        ObjectAnimator animator1=ObjectAnimator.ofFloat(iv_needle,View.ROTATION,NEEDLE_UP_ROTATION,0);
+
+    private void needleDown() {
+        ObjectAnimator animator1 = ObjectAnimator.ofFloat(iv_needle, View.ROTATION, NEEDLE_UP_ROTATION, 0);
         animator1.setDuration(500);
         animator1.setInterpolator(new LinearInterpolator());
         animator1.start();
     }
+
     /**
      * 接口回调
      * 标题栏更新
      */
     public DiscChangeListener disChange;
-    public interface DiscChangeListener{
+
+    public interface DiscChangeListener {
         void onActionBarChange(PlayList.Music bean);
     }
 
@@ -228,62 +237,67 @@ public class DiscView extends RelativeLayout {
     }
 
     private void PageScrollOperation(int state) {
-       switch (state){
-           /**
-            * 滑动完毕和静止
-            */
-           case ViewPager.SCROLL_STATE_IDLE:
-               break;
-           case ViewPager.SCROLL_STATE_SETTLING:
-              needleDown();
-               objectAnimators.get(vpDisc.getCurrentItem()).start();
-               break;
-           case ViewPager.SCROLL_STATE_DRAGGING:
-               //滑动时
-              needleUp();
-               objectAnimators.get(vpDisc.getCurrentItem()).cancel();//取消动画
-               break;
-       }
+        switch (state) {
+            /**
+             * 滑动完毕和静止
+             */
+            case ViewPager.SCROLL_STATE_IDLE:
+                break;
+            case ViewPager.SCROLL_STATE_SETTLING:
+                needleDown();
+                objectAnimators.get(vpDisc.getCurrentItem()).start();
+                break;
+            case ViewPager.SCROLL_STATE_DRAGGING:
+                //滑动时
+                needleUp();
+                objectAnimators.get(vpDisc.getCurrentItem()).cancel();//取消动画
+                break;
+        }
     }
+
     /**
      * 播放上一首
      */
-    public void playLast(){
-        vpDisc.setCurrentItem(vpDisc.getCurrentItem()-1,true);
+    public void playLast() {
+        vpDisc.setCurrentItem(vpDisc.getCurrentItem() - 1, true);
     }
 
     /**
      * 播放状态
      */
-    interface MusicStatus{
-        int MUSIC_PLAY=0;
-        int MUSIC_PAUSE=1;
+    interface MusicStatus {
+        int MUSIC_PLAY = 0;
+        int MUSIC_PAUSE = 1;
     }
-    int musicStatus=MusicStatus.MUSIC_PLAY;
-    public void playPause(){
-        if(musicStatus==MusicStatus.MUSIC_PLAY){
+
+    int musicStatus = MusicStatus.MUSIC_PLAY;
+
+    public void playPause() {
+        if (musicStatus == MusicStatus.MUSIC_PLAY) {
             //正在播放 点击暂停
             needleUp();
             objectAnimators.get(vpDisc.getCurrentItem()).pause();
-            musicStatus=MusicStatus.MUSIC_PAUSE;
-        }else if(musicStatus==MusicStatus.MUSIC_PAUSE){
+            musicStatus = MusicStatus.MUSIC_PAUSE;
+        } else if (musicStatus == MusicStatus.MUSIC_PAUSE) {
             //暂停 点击播放
             needleDown();
             objectAnimators.get(vpDisc.getCurrentItem()).resume();
-            musicStatus=MusicStatus.MUSIC_PLAY;
+            musicStatus = MusicStatus.MUSIC_PLAY;
         }
     }
+
     /**
      * 播放下一首
      */
-    public void playNext(){
-        vpDisc.setCurrentItem(vpDisc.getCurrentItem()+1,true);
+    public void playNext() {
+        vpDisc.setCurrentItem(vpDisc.getCurrentItem() + 1, true);
     }
+
     /**
      * 加载View大小
      */
     private void initSize() {
-        RATIO=1F*(getResources().getDisplayMetrics().heightPixels/1920.0F);
+        RATIO = 1F * (getResources().getDisplayMetrics().heightPixels / 1920.0F);
         NEEDLE_UP_ROTATION = -30;
 
         /*唱针宽高、距离等比例*/
@@ -312,12 +326,12 @@ public class DiscView extends RelativeLayout {
      * 加载唱针
      */
     private void initNeedle() {
-        iv_needle=(ImageView)findViewById(R.id.iv_needle);
-        RelativeLayout.LayoutParams params= (LayoutParams) iv_needle.getLayoutParams();
-        params.width= (int) NEEDLE_WIDTH;
-        params.height= (int) NEEDLE_HEIGHT;
-        params.leftMargin= (int) NEEDLE_MARGIN_LEFT;
-        params.topMargin= (int) NEEDLE_MARGIN_TOP*-1;
+        iv_needle = (ImageView) findViewById(R.id.iv_needle);
+        RelativeLayout.LayoutParams params = (LayoutParams) iv_needle.getLayoutParams();
+        params.width = (int) NEEDLE_WIDTH;
+        params.height = (int) NEEDLE_HEIGHT;
+        params.leftMargin = (int) NEEDLE_MARGIN_LEFT;
+        params.topMargin = (int) NEEDLE_MARGIN_TOP * -1;
         iv_needle.setLayoutParams(params);
         iv_needle.setPivotX(NEEDLE_PIVOT_X);
         iv_needle.setPivotY(NEEDLE_PIVOT_Y);
@@ -329,14 +343,15 @@ public class DiscView extends RelativeLayout {
      * 加载白色底盘
      */
     private void initDesc() {
-        iv_disc=(ImageView)findViewById(R.id.iv_disc_view);
-        RelativeLayout.LayoutParams params=(LayoutParams) iv_disc.getLayoutParams();
-        params.width= (int) DISC_BG_SIZE;
-        params.height= (int) DISC_BG_SIZE;
-        params.topMargin= (int) DISC_MARGIN_TOP;
+        iv_disc = (ImageView) findViewById(R.id.iv_disc_view);
+        RelativeLayout.LayoutParams params = (LayoutParams) iv_disc.getLayoutParams();
+        params.width = (int) DISC_BG_SIZE;
+        params.height = (int) DISC_BG_SIZE;
+        params.topMargin = (int) DISC_MARGIN_TOP;
         iv_disc.setLayoutParams(params);
     }
-    class VPAdapter extends PagerAdapter{
+
+    class VPAdapter extends PagerAdapter {
 
         @Override
         public int getCount() {
@@ -345,7 +360,7 @@ public class DiscView extends RelativeLayout {
 
         @Override
         public boolean isViewFromObject(View view, Object object) {
-            return view==object;
+            return view == object;
         }
 
         @Override
