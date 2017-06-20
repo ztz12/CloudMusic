@@ -75,7 +75,7 @@ public class BaseActivity extends AppCompatActivity {
 //    public abstract int layoutResID();
      ArrayList<String> stringList=new ArrayList<>();
     private RecyclerView rlView;
-
+    public MusicService.MusicBinder musicBinder;
     //方式二
     @Override
     public void setContentView(@LayoutRes int layoutResID) {
@@ -160,6 +160,22 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 通过Activity生命周期去控制
+     * 当Activity可见时，进行播放状态判断
+     */
+
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        if(musicBinder!=null) {
+//            if (musicBinder.isPlaying()) {
+//                iv_playStatus.setImageResource(R.mipmap.play_rdi_btn_pause);
+//            } else {
+//                iv_playStatus.setImageResource(R.mipmap.a2s);
+//            }
+//        }
+//    }
 
     private void register() {
         musicReceiver = new MusicBroadCastReceiver();
@@ -185,7 +201,7 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
-    public MusicService.MusicBinder musicBinder;
+
     ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
