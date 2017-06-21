@@ -152,10 +152,15 @@ public class DiscView extends RelativeLayout {
                 }
                 lastPositionOffsetPixels = positionOffsetPixels;
             }
-
+            int currPosition=0;//记录上一次播放的下标
             @Override
             public void onPageSelected(int position) {
-
+                if(currPosition<position){
+                    disChange.Next(position);
+                }else if(currPosition>position){
+                    disChange.Last(position);
+                }
+                currPosition=position;
             }
 
             @Override
@@ -230,6 +235,10 @@ public class DiscView extends RelativeLayout {
 
     public interface DiscChangeListener {
         void onActionBarChange(PlayList.Music bean);
+        //播放下一首
+        void Next(int position);
+        //播放上一首
+        void Last(int position);
     }
 
     public void setDisChange(DiscChangeListener disChange) {

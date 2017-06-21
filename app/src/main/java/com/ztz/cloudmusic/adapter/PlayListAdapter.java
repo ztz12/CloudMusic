@@ -87,36 +87,39 @@ public class PlayListAdapter extends RecyclerView.Adapter {
 //                    resultsBeanList.get(i).setPlayStatus(false);
 //                }
                 //判断当前条目和最后一个条目是否相等
-                if(bean.equals(mLastPosition)){
-                    Intent intent=new Intent(holder.itemView.getContext(), PlayDetailActivity.class);
-                    intent.putExtra(PlayDetailActivity.DETAIL_KEY,bean);
+//                if(bean.equals(mLastPosition)){
+                if (bean.isPlayStatus()) {
+                    Intent intent = new Intent(holder.itemView.getContext(), PlayDetailActivity.class);
+                    intent.putExtra(PlayDetailActivity.DETAIL_KEY, bean);
                     /**
                      *  Intent putParcelableArrayListExtra(String name, ArrayList<? extends Parcelable> value
                      *  上限下限为ArrayList必须用ArrayList
                      *
                      *因为在播放详情界面，需要拿到所有的歌曲列表，所以需要将集合传递给PlayDetailsActivity
                      */
-                    intent.putExtra(PlayDetailActivity.RESULTBEAN_KEY,playList);
+                    intent.putExtra(PlayDetailActivity.RESULTBEAN_KEY, playList);
                     intent.putExtra(PlayDetailActivity.INDEX_KEY, finalPosition);
-                    ((Activity)holder.itemView.getContext()).startActivity(intent);
+                    ((Activity) holder.itemView.getContext()).startActivity(intent);
+                } else {
+//                if(mLastPosition!=null){
+//                    mLastPosition.setPlayStatus(false);
+//                }
+                    //重置所有状态
+                    for (int i = 0; i < playList.getMusics().size(); i++) {
+                        playList.getMusics().get(i).setPlayStatus(false);
+                    }
+
+                    bean.setPlayStatus(true);
+                    notifyDataSetChanged();
+//                mLastPosition=bean;//重新赋值
+                    //本地广播
+                    Intent intent = new Intent(Constant.Action.ACTION_PLAY);
+                    //实现parcelable序列化
+                    intent.putExtra(PLAYDATA_KEY, playList);
+                    //获取本地广播管理器
+                    LocalBroadcastManager manager = LocalBroadcastManager.getInstance(itemViewHolder.itemView.getContext());
+                    manager.sendBroadcast(intent);
                 }
-                if(mLastPosition!=null){
-                    mLastPosition.setPlayStatus(false);
-                }
-                //重置所有状态
-                for(int i=0;i<playList.getMusics().size();i++){
-                    playList.getMusics().get(i).setPlayStatus(false);
-                }
-                bean.setPlayStatus(true);
-                notifyDataSetChanged();
-                mLastPosition=bean;//重新赋值
-                //本地广播
-                Intent intent=new Intent(Constant.Action.ACTION_PLAY);
-                //实现parcelable序列化
-                intent.putExtra(PLAYDATA_KEY,playList);
-                //获取本地广播管理器
-                LocalBroadcastManager manager=LocalBroadcastManager.getInstance(itemViewHolder.itemView.getContext());
-                manager.sendBroadcast(intent);
             }
         });
 

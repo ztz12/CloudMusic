@@ -137,10 +137,10 @@ public class PlayListActivity extends BaseActivity {
                     headView = recyclerView.getChildAt(findFirstVisibleItemPosition);
                 }
                 float alpha = 0;//完全透明
-                if (headView == null) {
-                    alpha = 1;//不透明
-                } else {
+                if (headView != null) {
                     alpha = Math.abs(headView.getTop() * 1.0f) / headView.getHeight();
+                } else {
+                    alpha=1;//不透明0
                 }
                 if (alpha > 0.5) {
                     tv_title.setText(playListBean.getPlayListName());
@@ -174,6 +174,16 @@ public class PlayListActivity extends BaseActivity {
 //
 //        }
 //    };
+
+    @Override
+    public void musicStatusChange() {
+        Log.i(TAG, "musicStatusChange: 我被调用了");
+        PlayList currPlayList=MusicService.getCurrPlay();
+        if(mPlayList.getObjectId().equals(currPlayList.getObjectId())){
+            mPlayList.setMusics(currPlayList.getMusics());
+            adapter.notifyDataSetChanged();
+        }
+    }
 
     //注册广播
     private void registerBroadCast() {
@@ -240,13 +250,15 @@ public class PlayListActivity extends BaseActivity {
                 for (int i = 0; i < playListResponse.getResults().size(); i++) {
                     PlayListResponse.ResultsBean bean = playListResponse.getResults().get(i);
                     String albumPic = bean.getAlbumPic() == null ? "" : bean.getAlbumPic().getUrl();
+                    String Lrc=bean.getLrc()==null?"":bean.getLrc().getUrl();
                     PlayList.Music music = new PlayList.Music(
                             bean.getObjectId(),
                             bean.getTitle(),
                             bean.getArtist(),
                             bean.getFileUrl().getUrl(),
                             albumPic,
-                            bean.getAlbum()
+                            bean.getAlbum(),
+                            Lrc
                     );
                     //使用服务的静态方法;
                     int currIndex = MusicService.getCurrIndex();

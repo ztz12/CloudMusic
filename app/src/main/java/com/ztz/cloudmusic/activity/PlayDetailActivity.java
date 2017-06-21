@@ -1,16 +1,22 @@
 package com.ztz.cloudmusic.activity;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.ztz.cloudmusic.R;
 import com.ztz.cloudmusic.bean.PlayList;
+import com.ztz.cloudmusic.service.MusicService;
 import com.ztz.cloudmusic.widget.DiscView;
 
 import butterknife.BindView;
@@ -78,10 +84,44 @@ public class PlayDetailActivity extends AppCompatActivity {
                 tvPName.setText(bean.getTitle());
                 tvArtist.setText(bean.getArtist());
             }
+
+            @Override
+            public void Next(int position) {
+                //播放下一首
+                Toast.makeText(PlayDetailActivity.this, "下一首", Toast.LENGTH_SHORT).show();
+                if(binder!=null){
+                    binder.play(position);
+                }
+            }
+
+            @Override
+            public void Last(int position) {
+                //播放上一首
+                Toast.makeText(PlayDetailActivity.this, "上一首", Toast.LENGTH_SHORT).show();
+                if(binder!=null){
+                    binder.play(position);
+                }
+            }
         });
         disv.setMusicData(mPlayList, position);
+        bindMusicService();
     }
+    MusicService.MusicBinder binder;
+    private void bindMusicService() {
+        Intent intent=new Intent(this, MusicService.class);
+        bindService(intent,connection,BIND_AUTO_CREATE);
+    }
+    ServiceConnection connection=new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            binder= (MusicService.MusicBinder) service;
+        }
 
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    };
     @OnClick(R.id.iv_back)
     public void onViewClicked() {
         finish();
@@ -97,8 +137,10 @@ public class PlayDetailActivity extends AppCompatActivity {
                 ivNow.setSelected(!ivNow.isSelected());
                 if (ivNow.isSelected()) {
                     ivNow.setImageResource(R.mipmap.play_rdi_btn_play);
+                    binder.pause();
                 } else {
                     ivNow.setImageResource(R.mipmap.play_rdi_btn_pause);
+                    binder.play();
                 }
                 disv.playPause();
                 break;

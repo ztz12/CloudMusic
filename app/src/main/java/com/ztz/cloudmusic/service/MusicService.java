@@ -15,6 +15,7 @@ import java.io.IOException;
 public class MusicService extends Service {
     public static MediaPlayer mp = new MediaPlayer();
     public static PlayList mPlayList;
+    //获取播放的下标
     public static int mCurrIndex = 0;
 
     public MusicService() {
@@ -49,18 +50,30 @@ public class MusicService extends Service {
                     mCurrIndex = i;
                 }
             }
+           playUrl(url);
+        }
+        public void play(int position){
+            //获取当前播放的下标
+            mCurrIndex=position;
+            for(int i=0;i<mPlayList.getMusics().size();i++){
+                mPlayList.getMusics().get(i).setPlayStatus(false);
+            }
+            PlayList.Music music=mPlayList.getMusics().get(mCurrIndex);
+            music.setPlayStatus(true);
+            String url=music.getMusicUrl();
+            playUrl(url);
+        }
+        public void playUrl(String url){
             mp.reset();
-            try {
+            try{
                 mp.setDataSource(url);
                 mp.prepare();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
             mp.start();
-            Intent intent = new Intent(Constant.Action.PLAY);
-            LocalBroadcastManager manager = LocalBroadcastManager.getInstance(MusicService.this);
-            manager.sendBroadcast(intent);
+            Intent intent=new Intent(Constant.Action.PLAY);
+            LocalBroadcastManager.getInstance(MusicService.this).sendBroadcast(intent);
         }
 
         public void pause() {

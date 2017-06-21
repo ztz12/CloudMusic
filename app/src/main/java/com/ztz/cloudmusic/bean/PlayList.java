@@ -9,14 +9,44 @@ import java.util.ArrayList;
  * Created by wqewqe on 2017/6/19.
  */
 
-public class PlayList implements Parcelable{
+public class PlayList implements Parcelable {
     //歌曲id；
     private String objectId;
     //歌曲列表
-    ArrayList<Music> musics=new ArrayList<>();
-    public PlayList(){
+    ArrayList<Music> musics = new ArrayList<>();
+
+    public PlayList() {
 
     }
+
+    protected PlayList(Parcel in) {
+        objectId = in.readString();
+        musics = in.createTypedArrayList(Music.CREATOR);
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(objectId);
+        dest.writeTypedList(musics);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<PlayList> CREATOR = new Creator<PlayList>() {
+        @Override
+        public PlayList createFromParcel(Parcel in) {
+            return new PlayList(in);
+        }
+
+        @Override
+        public PlayList[] newArray(int size) {
+            return new PlayList[size];
+        }
+    };
+
     public String getObjectId() {
         return objectId;
     }
@@ -33,33 +63,6 @@ public class PlayList implements Parcelable{
         this.musics = musics;
     }
 
-    protected PlayList(Parcel in) {
-        objectId = in.readString();
-        musics = in.createTypedArrayList(Music.CREATOR);
-    }
-
-    public static final Creator<PlayList> CREATOR = new Creator<PlayList>() {
-        @Override
-        public PlayList createFromParcel(Parcel in) {
-            return new PlayList(in);
-        }
-
-        @Override
-        public PlayList[] newArray(int size) {
-            return new PlayList[size];
-        }
-    };
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(objectId);
-        dest.writeTypedList(musics);
-    }
 
     /**
      * 歌曲类
@@ -83,16 +86,26 @@ public class PlayList implements Parcelable{
         //专辑名称
         private String album;
 
+        //歌词下载的链接
+        private String lrcUrl;
+
         //播放状态  true 播放   false 未播放
         private boolean playStatus = false;
 
-        public Music(String objectId, String title, String artist, String musicUrl, String albumPicUrl, String album) {
+        public Music(String objectId,
+                     String title,
+                     String artist,
+                     String musicUrl,
+                     String albumPicUrl,
+                     String album,
+                     String lrcUrl) {
             this.objectId = objectId;
             this.title = title;
             this.artist = artist;
             this.musicUrl = musicUrl;
             this.albumPicUrl = albumPicUrl;
             this.album = album;
+            this.lrcUrl = lrcUrl;
         }
 
         protected Music(Parcel in) {
@@ -102,6 +115,7 @@ public class PlayList implements Parcelable{
             musicUrl = in.readString();
             albumPicUrl = in.readString();
             album = in.readString();
+            lrcUrl = in.readString();
             playStatus = in.readByte() != 0;
         }
 
@@ -116,6 +130,14 @@ public class PlayList implements Parcelable{
                 return new Music[size];
             }
         };
+
+        public String getLrcUrl() {
+            return lrcUrl;
+        }
+
+        public void setLrcUrl(String lrcUrl) {
+            this.lrcUrl = lrcUrl;
+        }
 
         public String getObjectId() {
             return objectId;
@@ -186,6 +208,7 @@ public class PlayList implements Parcelable{
             dest.writeString(musicUrl);
             dest.writeString(albumPicUrl);
             dest.writeString(album);
+            dest.writeString(lrcUrl);
             dest.writeByte((byte) (playStatus ? 1 : 0));
         }
     }

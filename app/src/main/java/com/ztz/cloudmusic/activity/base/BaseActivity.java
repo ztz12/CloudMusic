@@ -18,28 +18,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.google.gson.Gson;
 import com.ztz.cloudmusic.R;
 import com.ztz.cloudmusic.bean.Constant;
-import com.ztz.cloudmusic.bean.HomeResponse;
 import com.ztz.cloudmusic.bean.PlayList;
-import com.ztz.cloudmusic.bean.PlayListResponse;
 import com.ztz.cloudmusic.service.MusicService;
-import com.ztz.cloudmusic.utils.HttpUtils;
-import com.ztz.cloudmusic.utils.JFMusicUrlJoint;
-
-import java.io.IOException;
-import java.util.ArrayList;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 /**
  * Created by wqewqe on 2017/6/16.
@@ -65,7 +53,6 @@ public class BaseActivity extends AppCompatActivity {
     public static String TAG = "BaseActivity";
     public ImageView iv_playStatus;
     public MusicBroadCastReceiver musicReceiver;
-    public static final String PLAY_KEY = "playData";
     //    //方式一
 //    @Override
 //    protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -91,16 +78,21 @@ public class BaseActivity extends AppCompatActivity {
 
     private RecyclerView rlView;
     public MusicService.MusicBinder musicBinder;
-    private HomeResponse.ResultsBean.PlayListBean playListBean;
-    public static final String PLAYLIST_KEY = "playListBean";
     private PlayListAdapter adapter;
-    ArrayList<PlayListResponse.ResultsBean> resultsBeanList = new ArrayList<>();
+
 
     //方式二
     @Override
     public void setContentView(@LayoutRes int layoutResID) {
         //加载父类布局
         View view = LayoutInflater.from(this).inflate(R.layout.activity_base, null);
+        ImageButton ib=(ImageButton)view.findViewById(R.id.ib);
+        ib.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideBehavior();
+            }
+        });
         initBottomView(view);
         FrameLayout root = (FrameLayout) view.findViewById(R.id.root);
         //加载子类布局
@@ -111,66 +103,12 @@ public class BaseActivity extends AppCompatActivity {
         TAG = getClass().getName();
         register();
         bindMusicService();
-        playListBean = getIntent().getParcelableExtra(PLAYLIST_KEY);
-        Log.i(TAG, "setContentView: " + playListBean);
-        getData(playListBean.getObjectId());
+
     }
 
-    private void getData(String objectId) {
-        OkHttpClient client = new OkHttpClient();
-        String url = Constant.URL.NEWPLAYLIST + JFMusicUrlJoint.getNewPlayListUrl(objectId);
-        final Request request = HttpUtils.requestGet(url);
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String result = response.body().string();
-                Log.i(TAG, "onResponse: " + result);
-                Gson gson = new Gson();
-                PlayListResponse playListResponse = gson.fromJson(result, PlayListResponse.class);
-                resultsBeanList.addAll(playListResponse.getResults());
-                playList.setObjectId(playListBean.getObjectId());
-                ArrayList<PlayList.Music> musics = new ArrayList<>();
-                for (int i = 0; i < playListResponse.getResults().size(); i++) {
-                    PlayListResponse.ResultsBean bean = playListResponse.getResults().get(i);
-                    String albumPic = bean.getAlbumPic() == null ? "" : bean.getAlbumPic().getUrl();
-                    PlayList.Music music = new PlayList.Music(
-                            bean.getObjectId(),
-                            bean.getTitle(),
-                            bean.getArtist(),
-                            bean.getFileUrl().getUrl(),
-                            albumPic,
-                            bean.getAlbum()
-                    );
-                    //使用服务的静态方法;
-                    int currIndex = MusicService.getCurrIndex();
-                    PlayList playList = MusicService.getCurrPlay();
-                    //需要判断正在播放的歌单是否和当前界面歌单的id一致，如果一致，那么直接取正在播放的下标
-                    if (currIndex != -1 && playList != null && playList.getObjectId().equals(playListBean.getObjectId())) {
-                        if (i == currIndex) {
-                            music.setPlayStatus(true);
-                        }
-                    }
-                    musics.add(music);
-                }
-                playList.setMusics(musics);
-                Log.i(TAG, "onResponse: " + musics.toString());
-                //在主线程刷新数据
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        adapter.notifyDataSetChanged();
-                    }
-                });
-            }
-        });
+    public void hideBehavior(){
+        behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
-
-
     private void initBottomView(View bottomView) {
         iv_playStatus = (ImageView) bottomView.findViewById(R.id.iv_play_Status);
         iv_playStatus.setOnClickListener(new View.OnClickListener() {
@@ -189,13 +127,44 @@ public class BaseActivity extends AppCompatActivity {
         ImageView ivShow = (ImageView) bottomView.findViewById(R.id.iv_show);
         LinearLayout ll = (LinearLayout) bottomView.findViewById(R.id.ll_base);
         rlView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new PlayListAdapter();
+        adapter = new PlayListAdapter(playList);
         rlView.setAdapter(adapter);
         behavior = BottomSheetBehavior.from(ll);
+//        behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+//            @Override
+//            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+//                if(newState==BottomSheetBehavior.STATE_EXPANDED){
+//                    findViewById(R.id.ll_content).setAlpha(0.5F);
+//                }else {
+//                    findViewById(R.id.ll_content).setAlpha(1);
+//                }
+//            }
+//
+//            @Override
+//            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+//
+//            }
+//        });
         ivShow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //获取正在播放的歌单
+                //使用临时变量获取数据
+                PlayList currPlayList=MusicService.getCurrPlay();
+                //播放列表为空
+                if(currPlayList==null){
+                    Toast.makeText(BaseActivity.this, "播放列表为空", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                /**
+                 * RecyclerView使用的是观察者模式
+                 * 观察者模式会一直观察这个对象，当对象数据发生改变是会自动/被动做一些操作
+                 */
+                //不改变对象引用的地址更新数据
                 behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                playList.setMusics(currPlayList.getMusics());
+                playList.setObjectId(currPlayList.getObjectId());
+                adapter.notifyDataSetChanged();
             }
         });
     }
@@ -204,7 +173,11 @@ public class BaseActivity extends AppCompatActivity {
     PlayList playList = new PlayList();
 
     class PlayListAdapter extends RecyclerView.Adapter {
+        PlayList playList;
 
+        public PlayListAdapter(PlayList playList) {
+            this.playList = playList;
+        }
 
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -224,7 +197,7 @@ public class BaseActivity extends AppCompatActivity {
             }
         }
 
-        PlayList.Music mLastPosition;
+
 
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
@@ -241,18 +214,23 @@ public class BaseActivity extends AppCompatActivity {
             viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mLastPosition != null) {
-                        mLastPosition.setPlayStatus(false);
-                    }
-                    for (int i = 0; i < playList.getMusics().size(); i++) {
+
+                    for(int i=0;i<playList.getMusics().size();i++){
                         playList.getMusics().get(i).setPlayStatus(false);
                     }
+
+                    //获取点击的歌曲
                     bean.setPlayStatus(true);
                     notifyDataSetChanged();
-                    mLastPosition = bean;
-                    Intent intent = new Intent(Constant.Action.ACTION_PLAY);
-                    intent.putExtra(PLAY_KEY, playList);
-                    LocalBroadcastManager.getInstance(viewHolder.itemView.getContext()).sendBroadcast(intent);
+                    long start=System.currentTimeMillis();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            musicBinder.play(playList);
+                        }
+                    }).start();
+                    long end=System.currentTimeMillis();
+                    Log.i(TAG, "onClick:执行时间 "+(end-start));
                 }
             });
         }
@@ -282,8 +260,7 @@ public class BaseActivity extends AppCompatActivity {
     private void register() {
         musicReceiver = new MusicBroadCastReceiver();
         IntentFilter intentFilter = new IntentFilter();
-        //注册两个广播
-        intentFilter.addAction(Constant.Action.ACTION_PLAY);
+        //注册多个广播
         intentFilter.addAction(Constant.Action.PLAY);
         intentFilter.addAction(Constant.Action.PAUSE);
         LocalBroadcastManager.getInstance(this).registerReceiver(musicReceiver, intentFilter);
@@ -296,11 +273,9 @@ public class BaseActivity extends AppCompatActivity {
 
             //如果接收多个广播 需判断广播类型
             switch (intent.getAction()) {
-                case Constant.Action.ACTION_PLAY:
-                    PlayList mPlay = intent.getParcelableExtra(PLAY_KEY);
-                    musicBinder.play(mPlay);
                 case Constant.Action.PLAY:
                     iv_playStatus.setImageResource(R.mipmap.play_rdi_btn_pause);
+                    musicStatusChange();
                     break;
                 case Constant.Action.PAUSE:
                     iv_playStatus.setImageResource(R.mipmap.a2s);
@@ -308,6 +283,10 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 音乐状态改变 播放新音乐
+     */
+    public void musicStatusChange(){}
 
     ServiceConnection connection = new ServiceConnection() {
         @Override
