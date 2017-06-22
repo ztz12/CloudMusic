@@ -109,11 +109,13 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:src="@mipmap/play_icn_loop_prs"/>
+
             <ImageView
                 android:id="@+id/iv_last"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@mipmap/play_btn_prev"/>
+                android:src="@mipmap/play_btn_prev" />
+
             <ImageView
                 android:id="@+id/iv_now"
                 android:layout_width="wrap_content"
@@ -140,6 +142,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/disv"></com.ztz.cloudmusic.widget.DiscView>
-
+        <com.ztz.cloudmusic.widget.LrcView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible"
+            android:id="@+id/lrcView"/>
         </RelativeLayout>
 </RelativeLayout>

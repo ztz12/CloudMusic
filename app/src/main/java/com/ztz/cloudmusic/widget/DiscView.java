@@ -180,6 +180,14 @@ public class DiscView extends RelativeLayout {
             PlayList.Music bean = mPlayList.getMusics().get(i);
             //循坏歌曲列表 创建view
             View view = LayoutInflater.from(getContext()).inflate(R.layout.item_iv_disc, vpDisc, false);
+            view.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(disChange!=null){
+                        disChange.onItemClick();
+                    }
+                }
+            });
             iv_disc_bg = (ImageView) view.findViewById(R.id.iv_disc_bg);
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_disc_bg.getLayoutParams();
             params.height = (int) DISC_SIZE;
@@ -239,6 +247,7 @@ public class DiscView extends RelativeLayout {
         void Next(int position);
         //播放上一首
         void Last(int position);
+        void onItemClick();
     }
 
     public void setDisChange(DiscChangeListener disChange) {
@@ -274,25 +283,29 @@ public class DiscView extends RelativeLayout {
     /**
      * 播放状态
      */
-    interface MusicStatus {
+    public  interface MusicStatus {
         int MUSIC_PLAY = 0;
         int MUSIC_PAUSE = 1;
     }
 
     int musicStatus = MusicStatus.MUSIC_PLAY;
+    public void setMusicStatus(int status){
+        musicStatus=status;
+    }
 
-    public void playPause() {
-        if (musicStatus == MusicStatus.MUSIC_PLAY) {
-            //正在播放 点击暂停
-            needleUp();
-            objectAnimators.get(vpDisc.getCurrentItem()).pause();
-            musicStatus = MusicStatus.MUSIC_PAUSE;
-        } else if (musicStatus == MusicStatus.MUSIC_PAUSE) {
+    public void pauseAnim() {
+
+        //正在播放 点击暂停
+        needleUp();
+        objectAnimators.get(vpDisc.getCurrentItem()).pause();
+        musicStatus = MusicStatus.MUSIC_PAUSE;
+    }
+    public void playAnim(){
             //暂停 点击播放
             needleDown();
             objectAnimators.get(vpDisc.getCurrentItem()).resume();
             musicStatus = MusicStatus.MUSIC_PLAY;
-        }
+
     }
 
     /**

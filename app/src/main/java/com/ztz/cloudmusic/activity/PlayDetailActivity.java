@@ -15,14 +15,25 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.ztz.cloudmusic.R;
+import com.ztz.cloudmusic.bean.LrcBeen;
 import com.ztz.cloudmusic.bean.PlayList;
 import com.ztz.cloudmusic.service.MusicService;
 import com.ztz.cloudmusic.widget.DiscView;
+import com.ztz.cloudmusic.widget.LrcView;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import jp.wasabeef.glide.transformations.BlurTransformation;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class PlayDetailActivity extends AppCompatActivity {
     public static final String DETAIL_KEY = "details";
@@ -53,7 +64,10 @@ public class PlayDetailActivity extends AppCompatActivity {
     ImageView ivNow;
     @BindView(R.id.iv_next)
     ImageView ivNext;
-//    private PlayListResponse.ResultsBean resultsBean;
+    @BindView(R.id.lrcView)
+    LrcView lrcView;
+    private PlayList.Music music;
+    //    private PlayListResponse.ResultsBean resultsBean;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +80,7 @@ public class PlayDetailActivity extends AppCompatActivity {
 //        Log.i(TAG, "onCreate: " + resultsBean);
         //获取下标
         int position = getIntent().getIntExtra(INDEX_KEY, 0);
-        PlayList.Music music = mPlayList.getMusics().get(position);
+        music = mPlayList.getMusics().get(position);
         Log.i(TAG, "onCreate: " + position);
         String url = "http://ac-kCFRDdr9.clouddn.com/e3e80803c73a099d96a5.jpg";
         if (music.getAlbumPicUrl() != null) {
@@ -86,35 +100,135 @@ public class PlayDetailActivity extends AppCompatActivity {
             }
 
             @Override
-            public void Next(int position) {
+            public void Next(final int position) {
                 //播放下一首
                 Toast.makeText(PlayDetailActivity.this, "下一首", Toast.LENGTH_SHORT).show();
-                if(binder!=null){
-                    binder.play(position);
+                if (binder != null) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            binder.play(position);
+                        }
+                    }).start();
+
                 }
             }
 
             @Override
-            public void Last(int position) {
+            public void Last(final int position) {
                 //播放上一首
                 Toast.makeText(PlayDetailActivity.this, "上一首", Toast.LENGTH_SHORT).show();
-                if(binder!=null){
-                    binder.play(position);
+                if (binder != null) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            binder.play(position);
+                        }
+                    }).start();
+                }
+            }
+
+            @Override
+            public void onItemClick() {
+               lrcView.setVisibility(View.VISIBLE);
+                disv.setVisibility(View.GONE);
+                if(lrcList.isEmpty()){
+                    downloadLrc(music.getLrcUrl());
+                }else {
+                    lrcView.setLrcData(lrcList);
                 }
             }
         });
         disv.setMusicData(mPlayList, position);
         bindMusicService();
+        lrcView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                lrcView.setVisibility(View.GONE);
+                disv.setVisibility(View.VISIBLE);
+            }
+        });
     }
+
+    /**
+     * 下载歌词
+     *
+     * @param lrcUrl
+     */
+    private void downloadLrc(String lrcUrl) {
+        OkHttpClient client = new OkHttpClient();
+        final Request request = new Request.Builder().url(lrcUrl).build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                //每一次都需要去请求歌词，可以将歌词存储到文件里面，
+                //下一次请求，判断是否存在该文件，如果存在，则直接使用
+                String result = response.body().string();
+                Log.i(TAG, "onResponse: " + result);
+                parseLrc(result);
+            }
+        });
+    }
+    ArrayList<LrcBeen> lrcList = new ArrayList<>();
+    /**
+     * 解析歌词
+     *
+     * @param result
+     */
+    private void parseLrc(String result) {
+        String[] split = result.split("\n");
+        Log.i(TAG, "parseLrc: " + Arrays.toString(split));
+        for (int i = 0; i < split.length; i++) {
+            String line = split[i];
+            //[00:00.00]
+            String[] arr = line.split("\\]");
+            //分钟
+            String min = arr[0].split(":")[0].replace("[", "");
+            //秒
+            String sec = arr[0].split(":")[1].split("\\.")[0];
+            //毫秒
+            String desc = arr[0].split(":")[1].split("\\.")[1];
+            Log.i(TAG, "parseLrc: " + min + " " + sec + " " + desc);
+            String content;
+            if(arr.length>1){
+                content=arr[1];
+            }else {
+                content="music";
+            }
+            //获取开始时间
+            long startTime = Long.valueOf(min) * 60 * 1000 + Long.valueOf(sec) * 1000 + Long.valueOf(desc);
+            //将获取的数据封装成对象
+            LrcBeen lrcBeen = new LrcBeen(content, startTime, 0);
+            lrcList.add(lrcBeen);
+            if (lrcList.size() > 1) {
+                lrcList.get(lrcList.size() - 2).setEndTime(startTime);
+            }
+            if (i == split.length - 1) {
+                lrcList.get(lrcList.size() - 1).setEndTime(startTime + 1000000);
+            }
+        }
+        Log.e(TAG, "parseLrc: " + lrcList.toString());
+    }
+
+
     MusicService.MusicBinder binder;
+
     private void bindMusicService() {
-        Intent intent=new Intent(this, MusicService.class);
-        bindService(intent,connection,BIND_AUTO_CREATE);
+        Intent intent = new Intent(this, MusicService.class);
+        bindService(intent, connection, BIND_AUTO_CREATE);
     }
-    ServiceConnection connection=new ServiceConnection() {
+
+    ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            binder= (MusicService.MusicBinder) service;
+            binder = (MusicService.MusicBinder) service;
+            //服务器连接成功 判断按钮播放状态
+            setPlayStatus();
         }
 
         @Override
@@ -122,9 +236,32 @@ public class PlayDetailActivity extends AppCompatActivity {
 
         }
     };
+
     @OnClick(R.id.iv_back)
     public void onViewClicked() {
         finish();
+    }
+
+    /**
+     * 改变播放状态
+     *
+     * @param view
+     */
+    public void setPlayStatus() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (binder.isPlaying()) {
+                    ivNow.setImageResource(R.mipmap.play_rdi_btn_pause);
+                    disv.setMusicStatus(DiscView.MusicStatus.MUSIC_PLAY);
+                    disv.playAnim();
+                } else {
+                    ivNow.setImageResource(R.mipmap.play_rdi_btn_play);
+                    disv.setMusicStatus(DiscView.MusicStatus.MUSIC_PAUSE);
+                    disv.pauseAnim();
+                }
+            }
+        });
     }
 
     @OnClick({R.id.iv_last, R.id.iv_now, R.id.iv_next})
@@ -132,20 +269,22 @@ public class PlayDetailActivity extends AppCompatActivity {
         switch (view.getId()) {
             case R.id.iv_last:
                 disv.playLast();
+                ivNow.setImageResource(R.mipmap.play_rdi_btn_pause);
                 break;
             case R.id.iv_now:
-                ivNow.setSelected(!ivNow.isSelected());
-                if (ivNow.isSelected()) {
-                    ivNow.setImageResource(R.mipmap.play_rdi_btn_play);
+                if (binder.isPlaying()) {
                     binder.pause();
+                    ivNow.setImageResource(R.mipmap.play_rdi_btn_play);
+                    disv.pauseAnim();
                 } else {
-                    ivNow.setImageResource(R.mipmap.play_rdi_btn_pause);
                     binder.play();
+                    ivNow.setImageResource(R.mipmap.play_rdi_btn_pause);
+                    disv.playAnim();
                 }
-                disv.playPause();
                 break;
             case R.id.iv_next:
                 disv.playNext();
+                ivNow.setImageResource(R.mipmap.play_rdi_btn_pause);
                 break;
         }
     }

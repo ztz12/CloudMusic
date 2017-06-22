@@ -114,4 +114,13 @@ public class MusicService extends Service {
     public static int getCurrIndex() {
         return mCurrIndex;
     }
+    /**
+     * 获取当前播放进度
+     */
+    public static int getCurrPosition(){
+        if(mp!=null){
+            return mp.getCurrentPosition();
+        }
+        return 0;
+    }
 }
