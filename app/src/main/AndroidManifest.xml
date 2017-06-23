@@ -32,6 +32,26 @@
         <activity android:name=".activity.PlayDetailActivity" />
         <activity android:name=".activity.base.NewFriendActivity" />
         <activity android:name=".activity.base.TestActivity"></activity>
+
+        <receiver android:name=".widget.MusicWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="com.ztz.cloudmusic.WIDGET_LAST" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.ztz.cloudmusic.WIDGET_PLAY" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.ztz.cloudmusic.WIDGET_NEXT" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/app_widget_provider_info" />
+        </receiver>
     </application>
 
 </manifest>

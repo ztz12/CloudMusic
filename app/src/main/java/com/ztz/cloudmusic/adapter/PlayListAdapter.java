@@ -81,6 +81,11 @@ public class PlayListAdapter extends RecyclerView.Adapter {
         itemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+
 //               String url=bean.getFileUrl().getUrl();
 
 //                for(int i=0;i<resultsBeanList.size();i++){
@@ -110,7 +115,12 @@ public class PlayListAdapter extends RecyclerView.Adapter {
                     }
 
                     bean.setPlayStatus(true);
-                    notifyDataSetChanged();
+                    ((Activity) holder.itemView.getContext()).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            notifyDataSetChanged();
+                        }
+                    });
 //                mLastPosition=bean;//重新赋值
                     //本地广播
                     Intent intent = new Intent(Constant.Action.ACTION_PLAY);
@@ -120,7 +130,10 @@ public class PlayListAdapter extends RecyclerView.Adapter {
                     LocalBroadcastManager manager = LocalBroadcastManager.getInstance(itemViewHolder.itemView.getContext());
                     manager.sendBroadcast(intent);
                 }
+                    }
+                }).start();
             }
+
         });
 
     }
