@@ -26,6 +26,7 @@ public class Constant {
         //通知-暂停播放音乐的通知，
         public final static String PAUSE = "com.jf.studentjfmusic.pause";
 
+        public final static String SEEK_PLAY="com.ztz.cloudmusic.play";
 
     }
 }

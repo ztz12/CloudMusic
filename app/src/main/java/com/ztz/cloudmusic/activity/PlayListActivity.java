@@ -16,6 +16,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -73,12 +74,15 @@ public class PlayListActivity extends BaseActivity {
     private PlayBroadCast broadCast;
     //歌单对象
     PlayList mPlayList = new PlayList();
+    public static SeekBar seekBar;
+    private SeekPlayReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play_list);
         ButterKnife.bind(this);
+        seekBar = (SeekBar) findViewById(R.id.sBar);
         playListBean = getIntent().getParcelableExtra(PLAYLISTBEAN_KEY);
 //        String objected=getIntent().getStringExtra(PLAYLISTBEAN_KEY);
         Log.e(TAG, "onCreate: " + playListBean);
@@ -140,7 +144,7 @@ public class PlayListActivity extends BaseActivity {
                 if (headView != null) {
                     alpha = Math.abs(headView.getTop() * 1.0f) / headView.getHeight();
                 } else {
-                    alpha=1;//不透明0
+                    alpha = 1;//不透明0
                 }
                 if (alpha > 0.5) {
                     tv_title.setText(playListBean.getPlayListName());
@@ -151,10 +155,59 @@ public class PlayListActivity extends BaseActivity {
             }
         });
         registerBroadCast();
+        registerSeek();
 //        bindMusicService();
         iv_list = (ImageView) headView.findViewById(R.id.iv_list_play);
         iv_list.setColorFilter(Color.BLACK);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                musicBinder.seekWait();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                int progress = seekBar.getProgress();
+                musicBinder.seekTo(progress);
+                musicBinder.seekNotify();
+            }
+        });
     }
+    public void registerSeek(){
+        receiver = new SeekPlayReceiver();
+        IntentFilter intentFilter=new IntentFilter();
+        intentFilter.addAction(Constant.Action.SEEK_PLAY);
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver,intentFilter);
+
+    }
+    class SeekPlayReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int duration=MusicService.getDuration();
+            int progress=MusicService.getCurrPosition();
+            seekBar.setMax(duration);
+            seekBar.setProgress(progress);
+        }
+    }
+//    public static Handler handlerMsg = new Handler() {
+//        @Override
+//        public void handleMessage(Message msg) {
+//            super.handleMessage(msg);
+//            switch (msg.what) {
+//                case 1:
+//                    int duration = msg.arg1;
+//                    int progress = msg.arg2;
+//                    seekBar.setMax(duration);
+//                    seekBar.setProgress(progress);
+//            }
+//        }
+//    };
 //
 //    MusicService.MusicBinder binder;
 //
@@ -178,8 +231,8 @@ public class PlayListActivity extends BaseActivity {
     @Override
     public void musicStatusChange() {
         Log.i(TAG, "musicStatusChange: 我被调用了");
-        PlayList currPlayList=MusicService.getCurrPlay();
-        if(mPlayList.getObjectId().equals(currPlayList.getObjectId())){
+        PlayList currPlayList = MusicService.getCurrPlay();
+        if (mPlayList.getObjectId().equals(currPlayList.getObjectId())) {
             mPlayList.setMusics(currPlayList.getMusics());
             adapter.notifyDataSetChanged();
         }
@@ -220,6 +273,7 @@ public class PlayListActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadCast);//取消广播注册
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
     }
 
     //获取状态栏高度
@@ -250,7 +304,7 @@ public class PlayListActivity extends BaseActivity {
                 for (int i = 0; i < playListResponse.getResults().size(); i++) {
                     PlayListResponse.ResultsBean bean = playListResponse.getResults().get(i);
                     String albumPic = bean.getAlbumPic() == null ? "" : bean.getAlbumPic().getUrl();
-                    String Lrc=bean.getLrc()==null?"":bean.getLrc().getUrl();
+                    String Lrc = bean.getLrc() == null ? "" : bean.getLrc().getUrl();
                     PlayList.Music music = new PlayList.Music(
                             bean.getObjectId(),
                             bean.getTitle(),

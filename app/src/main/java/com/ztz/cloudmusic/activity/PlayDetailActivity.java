@@ -1,20 +1,29 @@
 package com.ztz.cloudmusic.activity;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.ztz.cloudmusic.R;
+import com.ztz.cloudmusic.bean.Constant;
 import com.ztz.cloudmusic.bean.LrcBeen;
 import com.ztz.cloudmusic.bean.PlayList;
 import com.ztz.cloudmusic.service.MusicService;
@@ -66,7 +75,10 @@ public class PlayDetailActivity extends AppCompatActivity {
     ImageView ivNext;
     @BindView(R.id.lrcView)
     LrcView lrcView;
+    public static Handler handlerMsg;
+    public static SeekBar seekBar;
     private PlayList.Music music;
+    private SeekReceiver receiver;
     //    private PlayListResponse.ResultsBean resultsBean;
 
     @Override
@@ -74,6 +86,7 @@ public class PlayDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play_detail);
         ButterKnife.bind(this);
+        seekBar=(SeekBar)findViewById(R.id.seekBar);
         mPlayList = getIntent().getParcelableExtra(RESULTBEAN_KEY);
         Log.i(TAG, "onCreate: " + mPlayList);
 //        resultsBean = getIntent().getParcelableExtra(DETAIL_KEY);
@@ -102,7 +115,7 @@ public class PlayDetailActivity extends AppCompatActivity {
             @Override
             public void Next(final int position) {
                 //播放下一首
-                Toast.makeText(PlayDetailActivity.this, "下一首", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(PlayDetailActivity.this, "下一首", Toast.LENGTH_SHORT).show();
                 if (binder != null) {
                     new Thread(new Runnable() {
                         @Override
@@ -117,7 +130,7 @@ public class PlayDetailActivity extends AppCompatActivity {
             @Override
             public void Last(final int position) {
                 //播放上一首
-                Toast.makeText(PlayDetailActivity.this, "上一首", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(PlayDetailActivity.this, "上一首", Toast.LENGTH_SHORT).show();
                 if (binder != null) {
                     new Thread(new Runnable() {
                         @Override
@@ -130,11 +143,11 @@ public class PlayDetailActivity extends AppCompatActivity {
 
             @Override
             public void onItemClick() {
-               lrcView.setVisibility(View.VISIBLE);
+                lrcView.setVisibility(View.VISIBLE);
                 disv.setVisibility(View.GONE);
-                if(lrcList.isEmpty()){
+                if (lrcList.isEmpty()) {
                     downloadLrc(music.getLrcUrl());
-                }else {
+                } else {
                     lrcView.setLrcData(lrcList);
                 }
             }
@@ -148,6 +161,66 @@ public class PlayDetailActivity extends AppCompatActivity {
                 disv.setVisibility(View.VISIBLE);
             }
         });
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                binder.seekWait();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                int progress=seekBar.getProgress();
+                binder.seekTo(progress);
+                binder.seekNotify();
+            }
+        });
+        /**
+         * 如果一个线程中调用Looper.prepare()，那么系统就会自动的为该线程建立一个消息队列，
+         * 然后调用 Looper.loop();之后就进入了消息循环，这个之后就可以发消息、取消息、和处理消息
+         */
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                Looper.prepare();
+//                handlerMsg=new Handler(){
+//                    @Override
+//                    public void handleMessage(Message msg) {
+//                        super.handleMessage(msg);
+//                        switch (msg.what){
+//                            case 1:
+//                                int duration=msg.arg1;
+//                                int progress=msg.arg2;
+//                                seekBar.setMax(duration);
+//                                seekBar.setProgress(progress);
+//                        }
+//                    }
+//                };
+//                Looper.loop();
+//            }
+//        }).start();
+        registerSeek();
+    }
+    public void registerSeek(){
+        receiver = new SeekReceiver();
+        IntentFilter intentFilter=new IntentFilter();
+        intentFilter.addAction(Constant.Action.SEEK_PLAY);
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver,intentFilter);
+
+    }
+    class SeekReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int duration=MusicService.getDuration();
+            int progress=MusicService.getCurrPosition();
+            seekBar.setMax(duration);
+            seekBar.setProgress(progress);
+        }
     }
 
     /**
@@ -174,7 +247,9 @@ public class PlayDetailActivity extends AppCompatActivity {
             }
         });
     }
+
     ArrayList<LrcBeen> lrcList = new ArrayList<>();
+
     /**
      * 解析歌词
      *
@@ -195,10 +270,10 @@ public class PlayDetailActivity extends AppCompatActivity {
             String desc = arr[0].split(":")[1].split("\\.")[1];
             Log.i(TAG, "parseLrc: " + min + " " + sec + " " + desc);
             String content;
-            if(arr.length>1){
-                content=arr[1];
-            }else {
-                content="music";
+            if (arr.length > 1) {
+                content = arr[1];
+            } else {
+                content = "music";
             }
             //获取开始时间
             long startTime = Long.valueOf(min) * 60 * 1000 + Long.valueOf(sec) * 1000 + Long.valueOf(desc);
@@ -287,5 +362,12 @@ public class PlayDetailActivity extends AppCompatActivity {
                 ivNow.setImageResource(R.mipmap.play_rdi_btn_pause);
                 break;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(connection);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
     }
 }
