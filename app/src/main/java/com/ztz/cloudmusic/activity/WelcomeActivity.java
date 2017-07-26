@@ -1,9 +1,10 @@
 package com.ztz.cloudmusic.activity;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.view.WindowManager;
 
 import com.ztz.cloudmusic.R;
 import com.ztz.cloudmusic.utils.AppConfigUtils;
@@ -12,6 +13,8 @@ public class WelcomeActivity extends AppCompatActivity {
     Handler handler=new Handler();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //隐藏状态栏，全屏显示
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
         handler.postDelayed(runnable,2000);

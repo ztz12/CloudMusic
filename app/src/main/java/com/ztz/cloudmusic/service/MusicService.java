@@ -132,7 +132,7 @@ public class MusicService extends Service {
         }
 
         public void playUrl(final String url) {
-            mp.reset();
+            mp.release();
             try {
                 mp.setDataSource(url);
                 mp.prepare();

@@ -8,7 +8,7 @@ android {
     aaptOptions.useNewCruncher = false
     defaultConfig {
         applicationId "com.ztz.cloudmusic"
-        minSdkVersion 24
+        minSdkVersion 19
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"

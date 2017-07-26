@@ -191,6 +191,7 @@ public class GuideActivity extends AppCompatActivity {
                 }
             }
         });
+        //viewpager指示器实现viewpager Tab底部导航
         PageIndicatorView pageView = (PageIndicatorView) findViewById(R.id.pageIndicatorView);
         pageView.setViewPager(vp);
         pageView.setRadius(15F * ratio);

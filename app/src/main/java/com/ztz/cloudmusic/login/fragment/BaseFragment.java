@@ -19,7 +19,7 @@ public class BaseFragment extends Fragment{
      */
     public void showProgressDialog(String msg){
         if(progressDialog==null){
-            progressDialog=new ProgressDialog(getContext());
+            progressDialog=new ProgressDialog(getActivity());
         }
         progressDialog.setMessage(msg);
         progressDialog.show();

@@ -48,7 +48,7 @@ public class AppConfigUtils {
     public  boolean getGuide(Context context){
         return SpUtils.getBoolean(context,GUIDE);
     }
-    public  void setGuide(Context context,boolean key){
-        SpUtils.putBoolean(context,GUIDE,key);
+    public  void setGuide(Context context,boolean value){
+        SpUtils.putBoolean(context,GUIDE,value);
     }
 }

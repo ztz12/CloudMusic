@@ -243,7 +243,9 @@ public class PlayDetailActivity extends AppCompatActivity {
                 //下一次请求，判断是否存在该文件，如果存在，则直接使用
                 String result = response.body().string();
                 Log.i(TAG, "onResponse: " + result);
-                parseLrc(result);
+                if(result!=null) {
+                    parseLrc(result);
+                }
             }
         });
     }
